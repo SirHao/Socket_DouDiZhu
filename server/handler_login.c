@@ -1,5 +1,6 @@
 #include "handler.h"
 
+int user_temp_id=1;
 int login_handler(int client_fd)
 {
     int ret,status;
@@ -15,13 +16,22 @@ int login_handler(int client_fd)
     redis_execute(user, pwd, 2);
     if (strcmp(pwd, login_req->userpwd) == 0)
     {
-        login_rsp->result=true;
+        login_rsp->result=1;
         status=0;
-        printf("[info]登录成功：%s %s->%s\n", user, pwd, login_req->userpwd);
+        //printf("[info]登录成功：%s %s->%s\n", user, pwd, login_req->userpwd);
+        //内存中，在全局的玩家列表创建一个玩家基本信息
+        //todo：记得退出的时候销毁 free
+        struct player * ply=malloc(sizeof(struct player));
+        ply->id= user_temp_id++;
+        strcat(ply->name,login_req->username);
+        idm_set(player_map,ply->id,ply);  //存放在全局hash表player_map，索引为ply->id
+        struct player * plydev=idm_lookup(player_map,ply->id);
+        if(plydev) printf("[info]系统载入信息成功，玩家:%s-%d 上线\n",user,plydev->id);
+
     }
     else
     {
-        login_rsp->result=false;
+        login_rsp->result=-1;
         status=-1;
         printf("[info]登录失败：%s %s->%s\n", user, pwd, login_req->userpwd);
         

@@ -77,7 +77,7 @@ struct login_req_body
 
 struct login_rsp_body
 {
-    bool result;
+    int result;
 };
 
 struct quit_req_body

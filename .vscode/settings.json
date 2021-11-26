@@ -4,6 +4,7 @@
         "redis_utils.h": "c",
         "handler.h": "c",
         "common.h": "c",
-        "hiredis.h": "c"
+        "hiredis.h": "c",
+        "index_map.h": "c"
     }
 }

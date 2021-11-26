@@ -15,6 +15,7 @@ void client_loop_handler(int client_fd){
             fflush(stdout);
         }
     }
+    sleep(10);
 
     
 }

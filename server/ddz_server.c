@@ -17,7 +17,8 @@ void client_handler(thread_args *ags)
 
 int main()
 {
-
+    player_map = calloc(1, sizeof(struct index_map));
+    game_map = calloc(1, sizeof(struct index_map));
     int serverSocket;
     struct sockaddr_in server_addr;
     struct sockaddr_in clientAddr;
