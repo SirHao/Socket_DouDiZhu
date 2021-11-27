@@ -77,6 +77,7 @@ struct login_req_body
 
 struct login_rsp_body
 {
+    int usr_id;
     int result;
 };
 

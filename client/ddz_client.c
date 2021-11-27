@@ -2,6 +2,9 @@
 
 const char *server_ip = "127.0.0.1";
 #define SERVER_PORT 6666
+
+int user_id=0;
+
 void user_login(int clientSocket)
 {
     int ret;
@@ -31,7 +34,8 @@ void user_login(int clientSocket)
             perror("[error] recv");
         else if (login_rsp->result == 1)
         {
-            printf("登录成功\n");
+            user_id=login_rsp->usr_id;
+            printf("登录成功,用户id为%d\n",user_id);
             break;
         }
         else
@@ -42,6 +46,10 @@ void user_login(int clientSocket)
     free(login_req);
     free(login_rsp);
     free(req_hdr);
+}
+
+void user_quit(int clientSocket){
+    
 }
 int main(int argc, char *argv[])
 {
@@ -69,6 +77,18 @@ int main(int argc, char *argv[])
         printf("input your choice:(1:get person info),(2:create a room)\n");
         printf("                  (3:join a room    ),(4:quit         )\n");
         scanf("%d",&command);
+        if(command==1){
+
+        }else if(command==2){
+
+        }else if(command==3){
+
+        }else if(command=4){
+            
+            break;
+        }else{
+            printf("[info]请提供正确的指令\n");
+        }
     }
 
     close(clientSocket);
