@@ -1,30 +1,31 @@
 #include "handler.h"
-
-int quit_handler(int client_fd){
+static const char *quit_flag = "++++++";
+int quit_handler(int client_fd)
+{
+    char sendbuf[128];
     int ret;
-    struct quit_req_body*  quit_req=malloc(sizeof(struct quit_req_body));
-    struct quit_rsp_body*  quit_rsp=malloc(sizeof(struct quit_rsp_body));
 
-    ret = read(client_fd, quit_req, sizeof(struct quit_req_body));
+    struct player *ply = idm_lookup(player_map, client_fd);
+    if (ply)
+    {
+        idm_clear(player_map, client_fd);
+        printf("[info]用户%s-%d退出游戏\n",ply->name,ply->id);
+        free(ply);
+    }
+    else
+    {
+        perror("[error]del null user");
+    }
+
+    memset(sendbuf, 0, sizeof(sendbuf));
+    memcpy(sendbuf, quit_flag, strlen(quit_flag));
+    ret = send(client_fd, sendbuf, strlen(sendbuf) + 1, TCP_NODELAY);
+    printf("[debug5]发送预期%ld->实际：%d %s\n", strlen(sendbuf) + 1, ret, sendbuf);
     if (ret < 0)
-        perror("[info]recv login error:");
-    else{
-        printf("===%d===%d\n",ret,quit_req->user_id);fflush(stdout);
+    {
+        perror("[info]发送退出反馈失败");
+        return 0;
     }
-    struct player* ply=idm_lookup(player_map,quit_req->user_id);
-    if(ply==NULL){
-        perror("[quit]quit with no user");
-        quit_rsp->result=-1;
-    }else{
-        printf("[info]user:%s-%d,quit\n",ply->name,ply->id);
-        idm_clear(player_map,quit_req->user_id);
-        quit_rsp->result=1;
-    }
-    ret=send(client_fd,quit_rsp,sizeof(struct quit_rsp_body),TCP_NODELAY);
-    if(ret<0) perror("[error]send quit rsp error:");
 
-    free(ply);
-    free(quit_req);
-    free(quit_rsp);
-    return 0;
+    return 1;
 }

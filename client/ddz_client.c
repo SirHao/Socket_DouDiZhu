@@ -3,122 +3,154 @@
 const char *server_ip = "127.0.0.1";
 #define SERVER_PORT 6666
 
-int global_user_id = 0;
 int user_quit(int clientSocket)
 {
     int ret;
-    struct requset_header *req_hdr = malloc(sizeof(struct requset_header));
-    req_hdr->reqtype = QUIT_REQ;
-    struct quit_req_body *quit_req = malloc(sizeof(struct quit_req_body));
-    struct quit_rsp_body *quit_rsp = malloc(sizeof(struct quit_rsp_body));
-    ret = send(clientSocket, req_hdr, sizeof(struct requset_header), TCP_NODELAY);
-    if (ret < 0)
-        perror("[error] send1");
-    else
-    {
-        printf("--send quit1:%d--\n", ret);
-    }
+    char sendbuf[128];
+    char recvbuf[128];
 
-    quit_req->user_id = 0;
-    printf("[info]===%d===%d\n", ret, quit_req->user_id);
-    ret = send(clientSocket, quit_req, sizeof(struct quit_req_body), TCP_NODELAY);
+    memset(sendbuf, 0, sizeof(sendbuf));
+    memset(recvbuf, 0, sizeof(sendbuf));
+
+    sendbuf[0] = 'b';
+    ret = send(clientSocket, (char *)sendbuf, strlen(sendbuf), 0);
+    printf("[debug4]发送%d\n", ret);
     if (ret < 0)
-        perror("[error] send2");
-    else
-    {
-        printf("--send quit2:%d--\n", ret);
-    }
+        perror("[info]send login error:");
+
+    memset(recvbuf, 0, sizeof(recvbuf));
+    ret = recv(clientSocket, recvbuf, sizeof(recvbuf), 0);
+    printf("[debug5]接收%d %s\n", ret, recvbuf);
     fflush(stdout);
-    ret = recv(clientSocket, quit_rsp, sizeof(struct quit_rsp_body), 0);
     if (ret < 0)
-    {
         perror("[error] recv");
-        ret = -1;
+    else if (strcmp("++++++", recvbuf) == 0)
+    {
+        printf("退出成功\n");
+        fflush(stdout);
+        return 1;
     }
     else
     {
-        if (quit_rsp->result == 1)
-        {
-            printf("[info]退出成功，服务端已清理数据\n");
-            ret = 1;
-        }
-        else
-        {
-            printf("[info]退出失败\n");
-            ret = -1;
-        }
+        printf("退出失败\n");
+        return 0;
     }
-    free(quit_req);
-    free(quit_rsp);
-    free(req_hdr);
-    return ret;
 }
 void user_login(int clientSocket)
 {
+    static const char *success_flag = "******";
     int ret;
-    struct requset_header *req_hdr = malloc(sizeof(struct requset_header));
-    req_hdr->reqtype = LOGIN_REQ;
-    struct login_req_body *login_req = malloc(sizeof(struct login_req_body));
-    struct login_rsp_body *login_rsp = malloc(sizeof(struct login_rsp_body));
+    char sendbuf[128];
+    char recvbuf[128];
     while (1)
     {
-        //TODO:改成用户输入
-        strcat(login_req->username, "liuhao");
-        strcat(login_req->userpwd, "lh000");
+        memset(sendbuf, 0, sizeof(sendbuf));
+        memset(recvbuf, 0, sizeof(recvbuf));
 
-        ret = send(clientSocket, req_hdr, sizeof(struct requset_header), TCP_NODELAY);
-        printf("[debug1]发送%d\n",ret);
+        sendbuf[0] = 'a';
+        ret = send(clientSocket, (char *)sendbuf, strlen(sendbuf), 0);
+        printf("[debug1]发送%d\n", ret);
         if (ret < 0)
-            perror("[error] send1");
-        ret = send(clientSocket, login_req, sizeof(struct login_req_body), TCP_NODELAY);
-         printf("[debug2]发送%d\n",ret);
+            perror("[info]send login error:");
+
+        memset(sendbuf, 0, sizeof(sendbuf));
+        printf("user name:");
+        scanf("%s", sendbuf);
+        ret = send(clientSocket, sendbuf, strlen(sendbuf), 0);
+        printf("[debug2]发送%d\n", ret);
         if (ret < 0)
             perror("[error] send2");
+
+        memset(sendbuf, 0, sizeof(sendbuf));
+        printf("pwd:");
+        scanf("%s", sendbuf);
+        ret = send(clientSocket, sendbuf, strlen(sendbuf), 0);
+        printf("[debug2]发送%d\n", ret);
+        if (ret < 0)
+            perror("[error] send2");
+
+        memset(recvbuf, 0, sizeof(recvbuf));
+        ret = recv(clientSocket, recvbuf, sizeof(recvbuf), 0);
+        printf("[debug3]接收%d %s\n", ret, recvbuf);
         fflush(stdout);
-        ret = recv(clientSocket, login_rsp, sizeof(struct login_rsp_body), 0);
-        printf("[debug3]接收%d\n",ret);
         if (ret < 0)
             perror("[error] recv");
-            
-        else if (login_rsp->result == 1)
+        else if (strcmp("******", recvbuf) == 0)
         {
-            
-            global_user_id = login_rsp->usr_id;
-            printf("登录成功,用户id为%d\n", global_user_id);
+            printf("登录成功\n");
             fflush(stdout);
             break;
         }
         else
         {
-             printf("[debug3]接收%d\n",ret);
             printf("登录失败\n");
         }
     }
-    free(login_req);
-    free(login_rsp);
-    free(req_hdr);
 }
-void user_create_join_room(int clientSocket, int room_number)
+void user_create_join_room(int clientSocket)
 {
-    int ret;
-    struct requset_header *req_hdr = malloc(sizeof(struct requset_header));
-    struct create_room_req_body *create_room_req = malloc(sizeof(struct create_room_req_body));
-    struct create_room_rsp_body *create_room_rsp = malloc(sizeof(struct create_room_rsp_body));
 
-    req_hdr->reqtype = CREATE_ROOM_REQ;
-    ret = send(clientSocket, req_hdr, sizeof(struct requset_header), TCP_NODELAY);
-    create_room_req->room_number = room_number;
-    ret = send(clientSocket, create_room_req, sizeof(struct create_room_req_body), TCP_NODELAY);
+    char sendbuf[128];
+    char recvbuf[128];
+    int ret;
+
+    memset(sendbuf, 0, sizeof(sendbuf));
+    memset(recvbuf, 0, sizeof(recvbuf));
+
+    sendbuf[0] = 'd';
+    ret = send(clientSocket, (char *)sendbuf, strlen(sendbuf), 0);
+    printf("[debug4]发送%d\n", ret);
+    if (ret < 0)
+        perror("[info]send login error:");
+
+    memset(sendbuf, 0, sizeof(sendbuf));
+    printf("input room number, '0' means create a room > ");
+    scanf("%s", sendbuf);
+    ret = send(clientSocket, sendbuf, strlen(sendbuf), 0);
+    printf("[debug6]发送%d\n", ret);
     if (ret < 0)
         perror("[error] send2");
-    ret = recv(clientSocket, create_room_rsp, sizeof(struct create_room_rsp_body), MSG_WAITALL);
+
+    memset(recvbuf, 0, sizeof(recvbuf));
+    ret = recv(clientSocket, recvbuf, sizeof(recvbuf), 0);
+    printf("[debug7]接收%d %s\n", ret, recvbuf);
+    fflush(stdout);
     if (ret < 0)
-        perror("[error] recv create room");
-    printf("[info]成功加入/创建房间:%d\n",create_room_rsp->room_number);
-    free(create_room_req);
-    free(create_room_rsp);
-    free(req_hdr);
+        perror("[error] recv");
+    else
+    {
+        printf("[info]您的房间号为：%s\n", recvbuf);
+    }
 }
+
+void user_info(int clientSocket)
+{
+    int ret;
+    char sendbuf[128];
+    char recvbuf[128];
+
+    memset(sendbuf, 0, sizeof(sendbuf));
+    memset(recvbuf, 0, sizeof(recvbuf));
+
+    sendbuf[0] = 'c';
+    ret = send(clientSocket, (char *)sendbuf, strlen(sendbuf), 0);
+    printf("[debug4]发送%d\n", ret);
+    if (ret < 0)
+        perror("[info]send login error:");
+
+   
+    ret = recv(clientSocket, (char *)recvbuf, sizeof(recvbuf), 0);
+    printf("[debug8]接收%d\n", ret);
+    if (ret < 0)
+        perror("[info]send login error:");
+    else{
+        printf("=========个人积分==========\n");
+        printf("%s\n",recvbuf);
+        printf("=========-------==========\n");
+
+    }
+}
+
 int main(int argc, char *argv[])
 {
     int clientSocket, error, normal, ret;
@@ -143,20 +175,17 @@ int main(int argc, char *argv[])
     while (1)
     {
         int command = 0;
-        printf("input your choice:(1:get person info),(2:create a room)\n");
-        printf("                  (3:join a room    ),(4:quit         )\n");
+        printf("input your choice:(1:get person info),(2:create/join a room),(3:quit)\n");
         scanf("%d", &command);
         if (command == 1)
         {
+            user_info(clientSocket);
         }
         else if (command == 2)
         {
-            user_create_join_room(clientSocket,0);
+            user_create_join_room(clientSocket);
         }
-        else if (command == 3)
-        {
-        }
-        else if (command = 4)
+        else if (command = 3)
         {
             quit_flag = user_quit(clientSocket);
             if (quit_flag == 1)

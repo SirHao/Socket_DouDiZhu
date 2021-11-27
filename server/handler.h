@@ -24,3 +24,4 @@ void client_loop_handler(int client_fd);
 int login_handler(int client_fd);
 int quit_handler(int client_fd);
 int create_join_room_handler(int client_fd);
+int user_info_handler(int client_fd);

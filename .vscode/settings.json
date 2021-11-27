@@ -5,6 +5,7 @@
         "handler.h": "c",
         "common.h": "c",
         "hiredis.h": "c",
-        "index_map.h": "c"
+        "index_map.h": "c",
+        "algorithm": "c"
     }
 }
