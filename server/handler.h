@@ -22,5 +22,5 @@ struct index_map *game_map;
 
 void client_loop_handler(int client_fd);
 int login_handler(int client_fd);
-int join_room_handler(int client_fd);
 int quit_handler(int client_fd);
+int create_join_room_handler(int client_fd);

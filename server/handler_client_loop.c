@@ -8,6 +8,7 @@ void client_loop_handler(int client_fd){
     
     while(1){
         ret=recv(client_fd,req_header,sizeof(struct requset_header),MSG_WAITALL);
+        printf("--%d--\n",ret);
         if(ret<0 || req_header->reqtype!=LOGIN_REQ) perror("[info]recv login error:");
         else { 
             status=login_handler(client_fd);
@@ -16,9 +17,10 @@ void client_loop_handler(int client_fd){
             fflush(stdout);
         }
     }
-
+    printf("[info]start service for user\n");
     while(!quit_flag){
-        ret=recv(client_fd,req_header,sizeof(struct requset_header),MSG_WAITALL);
+        int rettt=recv(client_fd,req_header,sizeof(struct requset_header),MSG_WAITALL);
+        printf("=quit=%d=%d\n",rettt,req_header->reqtype);fflush(stdout);
         switch(req_header->reqtype){
             //退出
             case QUIT_REQ: 
@@ -26,7 +28,7 @@ void client_loop_handler(int client_fd){
             break;
             case CREATE_ROOM_REQ: 
             case JOIN_ROOM_REQ:
-            
+                create_join_room_handler(client_fd);
             break;
             case START_GAME_REQ:
             

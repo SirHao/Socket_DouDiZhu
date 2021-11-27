@@ -83,18 +83,22 @@ struct login_rsp_body
 
 struct quit_req_body
 {
+    int user_id;
 };
 
 struct quit_rsp_body
 {
+    int result;
 };
 
 struct create_room_req_body
 {
+    int room_number;
 };
 
 struct create_room_rsp_body
 {
+    int room_number;
 };
 
 struct join_room_req_body
