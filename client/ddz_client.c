@@ -67,17 +67,22 @@ void user_login(int clientSocket)
         strcat(login_req->userpwd, "lh000");
 
         ret = send(clientSocket, req_hdr, sizeof(struct requset_header), TCP_NODELAY);
+        printf("[debug1]发送%d\n",ret);
         if (ret < 0)
             perror("[error] send1");
         ret = send(clientSocket, login_req, sizeof(struct login_req_body), TCP_NODELAY);
+         printf("[debug2]发送%d\n",ret);
         if (ret < 0)
             perror("[error] send2");
         fflush(stdout);
         ret = recv(clientSocket, login_rsp, sizeof(struct login_rsp_body), 0);
+        printf("[debug3]接收%d\n",ret);
         if (ret < 0)
             perror("[error] recv");
+            
         else if (login_rsp->result == 1)
         {
+            
             global_user_id = login_rsp->usr_id;
             printf("登录成功,用户id为%d\n", global_user_id);
             fflush(stdout);
@@ -85,6 +90,7 @@ void user_login(int clientSocket)
         }
         else
         {
+             printf("[debug3]接收%d\n",ret);
             printf("登录失败\n");
         }
     }

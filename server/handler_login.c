@@ -7,8 +7,10 @@ int login_handler(int client_fd)
     struct login_rsp_body*  login_rsp=malloc(sizeof(struct login_rsp_body));
     login_rsp->result=false;
     ret = recv(client_fd, login_req, sizeof(struct login_req_body), MSG_WAITALL);
+    printf("[debug2]接收%d\n",ret);
     if (ret < 0)
         perror("[info]recv login error:");
+    
     char user[32] = "user:";
     char pwd[32] = {0};
     strcat(user, login_req->username);
@@ -38,6 +40,7 @@ int login_handler(int client_fd)
         
     }
     ret=send(client_fd,login_rsp,sizeof(struct login_rsp_body),TCP_NODELAY);
+    printf("[debug3]发送%d\n",ret);
     if(ret<0) perror("[info]发送登录反馈失败");
     free(login_req);
     free(login_rsp);
