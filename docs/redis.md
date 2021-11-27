@@ -14,6 +14,18 @@ redis数据库安装:
     > set user:hanjianyu hjy000
     > set user:mengxuanqi mxq000
     > set user:herenyuan hry000
+
+    > set win:liuhao 1
+    > set win:hanjianyu 9
+    > set win:mengxuanqi 8
+    > set win:herenyuan 7
+
+    > set loss:liuhao 7
+    > set loss:hanjianyu 2
+    > set loss:mengxuanqi 1
+    > set loss:herenyuan 10
+
+
     > get user:liuhao #返回b
 
 2. c语言使用redis
