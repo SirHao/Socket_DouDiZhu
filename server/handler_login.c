@@ -1,6 +1,5 @@
 #include "handler.h"
 
-int user_temp_id=1;
 int login_handler(int client_fd)
 {
     int ret,status;
@@ -17,12 +16,13 @@ int login_handler(int client_fd)
     if (strcmp(pwd, login_req->userpwd) == 0)
     {
         login_rsp->result=1;
+        login_rsp->usr_id=client_fd;
         status=0;
         //printf("[info]登录成功：%s %s->%s\n", user, pwd, login_req->userpwd);
         //内存中，在全局的玩家列表创建一个玩家基本信息
         //todo：记得退出的时候销毁 free
         struct player * ply=malloc(sizeof(struct player));
-        ply->id= user_temp_id++;
+        ply->id= client_fd;
         strcat(ply->name,login_req->username);
         idm_set(player_map,ply->id,ply);  //存放在全局hash表player_map，索引为ply->id
         struct player * plydev=idm_lookup(player_map,ply->id);
@@ -31,6 +31,7 @@ int login_handler(int client_fd)
     }
     else
     {
+        login_rsp->usr_id=-1;
         login_rsp->result=-1;
         status=-1;
         printf("[info]登录失败：%s %s->%s\n", user, pwd, login_req->userpwd);

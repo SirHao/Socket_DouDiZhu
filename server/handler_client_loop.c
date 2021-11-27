@@ -3,6 +3,7 @@
 void client_loop_handler(int client_fd){
     printf("[info] a client join fd:%d\n",client_fd);
     int ret,status=-1;
+    bool quit_flag=false;
     struct requset_header*  req_header=malloc(sizeof(struct requset_header));
     
     while(1){
@@ -15,7 +16,16 @@ void client_loop_handler(int client_fd){
             fflush(stdout);
         }
     }
-    sleep(10);
+
+    while(!quit_flag){
+        ret=recv(client_fd,req_header,sizeof(struct requset_header),MSG_WAITALL);
+        switch(req_header->reqtype){
+            case QUIT_REQ: break;
+        }
+    }
+
+    free(req_header);
+    
 
     
 }
