@@ -20,10 +20,20 @@ void client_loop_handler(int client_fd){
     while(!quit_flag){
         ret=recv(client_fd,req_header,sizeof(struct requset_header),MSG_WAITALL);
         switch(req_header->reqtype){
-            case QUIT_REQ: break;
+            //退出
+            case QUIT_REQ: 
+            quit_flag=quit_handler(client_fd);
+            break;
+            case CREATE_ROOM_REQ: 
+            case JOIN_ROOM_REQ:
+            
+            break;
+            case START_GAME_REQ:
+            
+            break;
         }
     }
-
+    printf("[info]用户退出游戏\n");
     free(req_header);
     
 
