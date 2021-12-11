@@ -13,6 +13,7 @@ struct dodizhu_game{
     int room_number;
     int cur_player_numbers;
     int players[3];   //都是id
+    char pokers[3][18];
 };
 
 
@@ -25,3 +26,6 @@ int login_handler(int client_fd);
 int quit_handler(int client_fd);
 int create_join_room_handler(int client_fd);
 int user_info_handler(int client_fd);
+
+int poker_shuffle_handler(int room_no);
+int poker_deliver_handler(int room_no);

@@ -23,12 +23,15 @@ int create_join_room_handler(int client_fd)
     if (ret < 0)
         perror("[info]recv join/create error:");
 
+    // body = 0，创建房间的请求
     if (strcmp("0", recvbuf) == 0)
     {
         srand((unsigned)time(NULL));
         while (1)
         {
+            // 随机摇房间号
             room_no = rand() % 1023 + 1;
+            // 查找房间号是否摇重了，重了就利用while重新摇
             game = idm_lookup(game_map, room_no);
             if (!game)
             {
@@ -44,6 +47,7 @@ int create_join_room_handler(int client_fd)
             }
         }
     }
+    // body != 0，加入房间的请求
     else
     {
         room_no = atoi(recvbuf);
@@ -73,18 +77,22 @@ int create_join_room_handler(int client_fd)
 create_join_room_end:
 
     memset(sendbuf, 0, sizeof(sendbuf));
+    // 1: 创建房间成功
     if (join_result == 1)
     {
         sprintf(sendbuf, "@create: %d @", room_no);
     }
+    // 2: 加入房间成功
     else if (join_result == 2)
     {
         sprintf(sendbuf, "@join: %d @", room_no);
     }
+    // 3: 要加入的房间已经满3个人
     else if (join_result == 3)
     {
         memcpy(sendbuf, room_no_space, strlen(room_no_space));
     }
+    // 4: 房间号为负，命令不合法
     else
     {
         memcpy(sendbuf, room_number_error, strlen(room_number_error));
@@ -94,5 +102,14 @@ create_join_room_end:
     if (ret < 0)
         perror("[info]发送登录反馈失败");
 
+    if (join_result == 2){
+        // 最后一个加入到房间的玩家处理游戏洗牌
+        if ((game->cur_player_numbers) == 3){
+            printf("[debug8]预期：第三个玩家开始洗牌\n");
+            poker_shuffle_handler(room_no);
+            printf("[debug10]预期：第三个玩家洗牌结束\n");
+            poker_deliver_handler(room_no);
+        }
+    }
     return 0;
 }

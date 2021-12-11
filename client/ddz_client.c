@@ -151,6 +151,29 @@ void user_info(int clientSocket)
     }
 }
 
+void user_wait_pokers(int clientSocket){
+    char recvbuf[18];
+    int ret;
+
+    memset(recvbuf, 0, sizeof(recvbuf));
+    ret = recv(clientSocket, recvbuf, sizeof(recvbuf), 0);
+    printf("[debug16]接收%d (%s)\n", ret, recvbuf);
+    fflush(stdout);
+    if (ret < 0){
+        perror("[info]receive pokers error:");
+    }else{
+        printf("[info]Recv Pokers: (%s)\n", recvbuf);
+        printf("[info]Your Pokers:\n");
+        for (int i = 0; i < 18; i++){
+            if (recvbuf[i] == 'T')
+                printf("10 ");
+            else
+                printf("%c ", recvbuf[i]);
+        }
+        printf("\n");
+    }
+}
+
 int main(int argc, char *argv[])
 {
     int clientSocket, error, normal, ret;
@@ -184,6 +207,8 @@ int main(int argc, char *argv[])
         else if (command == 2)
         {
             user_create_join_room(clientSocket);
+            // 等待客户端发牌
+            user_wait_pokers(clientSocket);
         }
         else if (command = 3)
         {
