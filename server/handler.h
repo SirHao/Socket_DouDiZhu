@@ -27,5 +27,7 @@ int quit_handler(int client_fd);
 int create_join_room_handler(int client_fd);
 int user_info_handler(int client_fd);
 
+int start_game_handler(int ply_number, int room_no);
+
 int poker_shuffle_handler(int room_no);
 int poker_deliver_handler(int room_no);

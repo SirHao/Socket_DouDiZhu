@@ -1,2 +1,2 @@
-server: ddz_server.c handler_client_loop.c handler_login.c index_map.c handler_create_join_room.c handler_quit.c handler_user_info.c handler_poker.c
-	gcc -o ddz_s ddz_server.c handler_client_loop.c handler_login.c index_map.c handler_create_join_room.c handler_quit.c handler_user_info.c handler_poker.c -lpthread -lhiredis
+server: ddz_server.c handler_client_loop.c handler_login.c index_map.c handler_room.c handler_quit.c handler_user_info.c handler_game.c handler_poker.c
+	gcc -o ddz_s ddz_server.c handler_client_loop.c handler_login.c index_map.c handler_room.c handler_quit.c handler_user_info.c handler_game.c handler_poker.c -lpthread -lhiredis

@@ -102,14 +102,6 @@ create_join_room_end:
     if (ret < 0)
         perror("[info]发送登录反馈失败");
 
-    if (join_result == 2){
-        // 最后一个加入到房间的玩家处理游戏洗牌
-        if ((game->cur_player_numbers) == 3){
-            printf("[debug8]预期：第三个玩家开始洗牌\n");
-            poker_shuffle_handler(room_no);
-            printf("[debug10]预期：第三个玩家洗牌结束\n");
-            poker_deliver_handler(room_no);
-        }
-    }
+    start_game_handler(join_result, room_no);
     return 0;
 }
